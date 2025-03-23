@@ -22,12 +22,18 @@ def cleanup_file(file_path: str):
 def read_root():
     return {"Hello": "World"}
 
+MAX_MARKDOWN_LENGTH = 100_000  # 最大文字数の制限
+
 @app.post("/convert", summary="Markdown to PDF Converter", description="JSONで受け取ったMarkdownをPandocでPDFに変換して返します。")
 async def convert_markdown(
     input: MarkdownInput,
     background_tasks: BackgroundTasks,
     orientation: Literal["portrait", "landscape"] = Query("portrait", description="用紙向き。portrait（縦）またはlandscape（横）")
 ):
+    # 入力サイズのチェック
+    if len(input.markdown) > MAX_MARKDOWN_LENGTH:
+        raise HTTPException(status_code=413, detail="入力されたMarkdownのサイズが大きすぎます。")
+    
     # システムの一時ディレクトリを利用し、一意なファイル名を生成
     temp_dir = tempfile.gettempdir()
     unique_id = str(uuid.uuid4())
