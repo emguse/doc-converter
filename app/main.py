@@ -52,7 +52,9 @@ async def convert_markdown(
             "--pdf-engine=xelatex",
             "-V", "mainfont=Noto Sans CJK JP",
             "-V", "geometry:margin=1in",
-            "--wrap=preserve"
+            "--wrap=preserve",
+            # "--listings",
+            "--lua-filter=diagram.lua",
         ]
         # 用紙向きが landscape の場合、geometry オプションを追加
         if orientation == "landscape":

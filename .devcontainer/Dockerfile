@@ -6,7 +6,7 @@ WORKDIR /app
 
 # 必要なシステムパッケージのインストール
 RUN apt-get update && apt-get install -y \
-    pandoc \
+    wget \
     texlive-xetex \
     texlive-fonts-recommended \
     texlive-lang-japanese \
@@ -14,6 +14,15 @@ RUN apt-get update && apt-get install -y \
     fonts-ipafont \
     fonts-ipaexfont \
     && rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && apt-get install -y nodejs
+
+RUN wget https://github.com/jgm/pandoc/releases/download/3.6.4/pandoc-3.6.4-1-arm64.deb \
+    && dpkg -i pandoc-3.6.4-1-arm64.deb \
+    && rm pandoc-3.6.4-1-arm64.deb
+
+# mermaid-cli のインストール（mermaid 図のレンダリング用）
+RUN npm install -g @mermaid-js/mermaid-cli
 
 # uv のインストール
 RUN pip install uv
@@ -30,6 +39,9 @@ RUN uv venv .venv && uv sync
 
 # アプリケーションコードをコピー（ホストの app ディレクトリから）
 COPY ./app /app
+
+# diagram.lua をダウンロード
+RUN curl -o ./diagram.lua https://raw.githubusercontent.com/pandoc-ext/diagram/refs/heads/main/_extensions/diagram/diagram.lua
 
 # FastAPI の起動（ホットリロード対応、main.py は app ディレクトリ内）
 CMD [".venv/bin/uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
