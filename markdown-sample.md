@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
 ```mermaid
 graph TD
-  A[doc-converter (Project Root)]
+  A["doc-converter (Project Root)"]
   A --> B[.devcontainer]
   B --> B1[Dockerfile]
   B --> B2[devcontainer.json]
